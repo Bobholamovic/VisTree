@@ -22,9 +22,9 @@ EDGE_COLORS = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b',
 TEXT_SIZE = 15
 ROTATE_TEXT_ON = True
 EXTRA_ROTATION_ANGLE = 90
-
-MARGIN_X = 10
-MARGIN_Y = 10
+LINE_WIDTH = 1
+MARGIN_X = 0
+MARGIN_Y = 0
 FIG_SIZE = (10, 10)
 
 
@@ -56,15 +56,12 @@ def draw_tree(tree, save=True):
     # 就不考虑效率了害
     # 我就想这样写，快乐就够了
     class _Const:
-        _all_instances = dict()
-        def __init__(self):
-            self.locked = False
         def __set_name__(self, owner, name):
             self.name = '_'+name
         def __set__(self, obj, val):
-            if not self.locked:
+            if not hasattr(obj, self.name+'_locked'):
                 setattr(obj, self.name, val)
-                self.locked = True
+                setattr(obj, self.name+'_locked', True)
             else:
                 raise RuntimeError
         def __get__(self, obj, objtype=None):
@@ -151,8 +148,7 @@ def draw_tree(tree, save=True):
     def _draw_edges(tree, pos):
         for from_, to_ in tree.edges:
             clr = tree.edges[from_, to_].get(_COLOR_ATTR, 'k')
-            # TODO: 设置线宽
-            plt.plot([pos[from_][0], pos[to_][0]], [pos[from_][1], pos[to_][1]], color=clr)
+            plt.plot([pos[from_][0], pos[to_][0]], [pos[from_][1], pos[to_][1]], color=clr, lw=LINE_WIDTH)
 
     # 最核心的算法调库实现了，剩下的都是暴力和业务逻辑
     pos = graphviz_layout(tree, prog='twopi', args='')
